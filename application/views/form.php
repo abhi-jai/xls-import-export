@@ -1,54 +1,14 @@
-<?php
-$html='';
-function catdisplay($arr, $id, $i = 0, $j = -1)
-{
-    global $html;
-    foreach ($arr as $data) {
-        if ($id == $data->parent_category) {
-            if ($i > $j) {
-                if ($html == '') {
-                    $html .= '<ul class="nav navbar-nav">';
-                } else {
-                    $html .= '<ul class="dropdown-menu">';
-                }
-            }
-            if ($i == $j) {
-                $html .= '</li>';
-            }
-            $html .= '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">' . $data->name . '<span class="caret"></span></a>';
-            if ($i > $j) {
-                $j = $i;
-            }
-            $i++;
-            catdisplay($arr, $data->id, $i, $j);
-            $i--;
-        }
-    }
-    if ($i == $j) {
-        $html .= '</li></ul>';
-    }
-    return $html;
-}
-?>
-
 <div class="container">
     <div class="row">
         <div class="col-md-6" style="margin-top: 100px;">
-            <h1 class="text-center">Add category form</h1>
-            <span style="color:red;"><?= validation_errors() ?></span>
-            <form method="post" action="<?= site_url('Arp/save') ?>">
+            <h1 class="text-center">Upload data</h1>
+            <form method="post" action="<?= site_url('App/save') ?>" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Category name</label>
-                    <input class="form-control" name="category" placeholder="Category Name" />
+                    <input class="form-control" type="file" name="xlsx" />
                 </div>
                 <div class="form-group">
-                    <label> Parent Category</label>
-                    <select class="form-control" name="parent_category">
-                        <option value=""> select category</option>
-                        <?php foreach ($category as $cat) { ?>
-                            <option value="<?= $cat->id ?>"><?= $cat->name ?></option>
-                        <?php } ?>
-                    </select>
+                    <a href="<?= site_url('App/download') ?>">Download demo file</a>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Save" class="btn btn-primary" />
@@ -56,12 +16,40 @@ function catdisplay($arr, $id, $i = 0, $j = -1)
             </form>
         </div>
         <div class="col-md-6" style="margin-top: 100px; padding:15px">
-            <?= catdisplay($category, 0) ?>
+            <?php if (!empty($users)) { ?>
+                <div class="responsive">
+                    <table class="table">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>State</th>
+                            <th>City</th>
+                        </tr>
+                        <?php foreach ($users as $usr) { ?>
+                            <tr>
+                                <td><?= $usr->name ?></td>
+                                <td><?= $usr->email ?></td>
+                                <td><?= $usr->phone ?></td>
+                                <td>
+                                    <select>
+                                        <?php foreach ($state as $s) { ?>
+                                            <option value="<?= $s->id ?>" <?= ($s->id == $usr->state_id ? 'selected' : '') ?>><?= $s->state_name ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select>
+                                        <?php foreach ($city as $s) { ?>
+                                            <option value="<?= $s->id ?>" <?= ($s->id == $usr->city_id ? 'selected' : '') ?>><?= $s->city_name ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </table>
+                </div>
+            <?php } ?>
         </div>
     </div>
 </div>
-<script>
-    $(".dropdown-toggle").click(function() {
-        $(this).next('ul').show();
-    });
-</script>
